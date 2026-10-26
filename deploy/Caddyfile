@@ -1,0 +1,33 @@
+# Caddy: HTTPS sertifikatni o'zi oladi va yangilaydi (Let's Encrypt).
+# tashrif.example.uz ni o'z domeningizga, email ni o'z pochtangizga almashtiring.
+# Ishlatish:  sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+
+{
+	email admin@example.uz
+}
+
+tashrif.example.uz {
+	encode zstd gzip
+
+	# Faqat shu server ichidagi Node jarayoniga yo'naltiramiz
+	reverse_proxy 127.0.0.1:3000
+
+	# Rasm yuklash chegarasi (ilova 5 MB gacha ruxsat beradi)
+	request_body {
+		max_size 6MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/tashrif.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+	}
+}
